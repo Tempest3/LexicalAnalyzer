@@ -18,8 +18,8 @@ public class LexicalAnalyzer{
         LexicalAnalyzer la = new LexicalAnalyzer();
 
         ArrayList<FileCharacter> charList = la.getInput();
-        la.getAllTokens(charList, false); //<true> enables print
-        la.printAllTokens();
+        la.getAllTokens(charList, true); //<true> enables print
+        //la.printAllTokens();
     }
 
     // prompts user for input file and calls readFile()
@@ -110,25 +110,40 @@ public class LexicalAnalyzer{
         //int or double
         else if(Character.isDigit(c)){
             int decimalsFound = 0;
-            while(decimalsFound <= 1 && (Character.isDigit(c) || c == '.')&& charList.size() > 0){
+            boolean justFoundDec = false;
+            while(decimalsFound <= 1 && (Character.isDigit(c) || c == '.')){
                 value += c.toString();
+                //track if current char was decimal
+                if(c == '.')
+                    justFoundDec = true;
+                else
+                    justFoundDec = false;
+
+                //exit loop if no more chars to read
+                if(charList.size() == 0)
+                    break;
+                //read next char
                 c=charList.get(0).getChar();
                 //track number of decimals read
-                if(c == '.')
-                    ++decimalsFound;
+                if(c== '.')
+                    ++decimalsFound;                
                 //remove if valid char
                 if(decimalsFound <= 1 && (Character.isDigit(c) || c == '.'))
                     charList.remove(0);
             }
-            if(decimalsFound == 0){            
+            if(justFoundDec){
+                outputString += "error: " + value + " missing final digit[s]";
+            }
+            else if(decimalsFound == 0){            
                 lex = new Lexeme(TokenType.INT_CONSTANT, value);
                 outputString += "int constant: " + value;
+                this.tokenList.add(lex);
             }
             else{
                 lex = new Lexeme(TokenType.DOUBLE_CONSTANT, value);
                 outputString += "double constant: " + value;
-            }
-            this.tokenList.add(lex);
+                this.tokenList.add(lex);
+            }            
         }
         //string
         else if(c == '\"'){
