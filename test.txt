@@ -1,0 +1,2 @@
+int 6 this is 6.0 double = 
+"the space" 0.0.1 "testing if
